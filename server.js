@@ -473,11 +473,25 @@ socket.on("leavingRoom", async ({ roomId, token } = {}) => {
 
 app.get("/", async  (_, res) => {
   // ping redis and mongo to keep connections alive
-  const user = await User.findOne({});
-  const pong = await redisClient.ping();
-  res.json({ msg: "Server is running", db: !!user, redis: pong === "PONG" });
+  try {
+    await User.findOne({});
+    await redisClient.ping();
+    res.send("Server is running");
+  } catch (err) {
+    res.status(503).send("Service Unavailable");
+  }
 }
 );
+
+app.head("/health", async (_, res) => {
+  try {
+    await User.findOne({});
+    await redisClient.ping();
+    res.status(200).end();
+  } catch (err) {
+    res.status(503).end();
+  }
+});
 
 app.post("/checkRoom", (req, res) => {
   const { roomId } = req.body;

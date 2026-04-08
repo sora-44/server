@@ -21,6 +21,9 @@ import { createChat } from "./ai_agent/AI.js";
 import { canSendMessage, deleteRoom } from "./utils/chatLimiter.js";
 import mongoose from "mongoose";
 
+const ENV= process.env.ENV || "development";
+const host = ENV === "production" ? "0.0.0.0" : "localhost";
+
 connectDB();
 const db = mongoose.connection;
 const app = express();
@@ -468,7 +471,13 @@ socket.on("leavingRoom", async ({ roomId, token } = {}) => {
 });
 
 
-app.get("/", (_, res) => res.json({ msg: "Server running" }));
+app.get("/", async  (_, res) => {
+  // ping redis and mongo to keep connections alive
+  const user = await User.findOne({});
+  const pong = await redisClient.ping();
+  res.json({ msg: "Server is running", db: !!user, redis: pong === "PONG" });
+}
+);
 
 app.post("/checkRoom", (req, res) => {
   const { roomId } = req.body;
@@ -614,6 +623,6 @@ process.on("uncaughtException", (err) =>
 );
 
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, "0.0.0.0", () =>
-  console.log(`Server running on port ${PORT}`)
+server.listen(PORT,host, () =>
+  console.log(`Server running : ${ENV=== "production" ? "https://server-p9j7.onrender.com/" : `http://${host}:${PORT}`} `)
 );

@@ -9,7 +9,7 @@ import { createClient } from 'redis';
 const redisClient = createClient({
   socket: {
     host: process.env.redis_host,
-    port: process.env.redis_port,
+    port: process.env.rd_port,
   },
   username: process.env.redis_username,
   password: process.env.redis_pass,

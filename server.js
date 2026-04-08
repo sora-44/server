@@ -638,5 +638,5 @@ process.on("uncaughtException", (err) =>
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT,host, () =>
-  console.log(`Server running : ${ENV=== "production" ? "https://server-p9j7.onrender.com/" : `http://${host}:${PORT}`} `)
+  console.log(`Server running on port ${PORT} : ${ENV=== "production" ? "https://server-p9j7.onrender.com/" : `http://${host}:${PORT}`} `)
 );
